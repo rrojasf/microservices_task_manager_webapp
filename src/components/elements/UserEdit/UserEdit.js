@@ -29,11 +29,8 @@ class UserEdit extends Component {
 
   onSubmit = e => {
     e.preventDefault()
-    let updateLegend = this.state.name
-
     this.props.updateUser(this.state._id, this.state.name)
     this.setState({ _id: "", name: "" })
-    //this.refreshItem(updateLegend)
   }
 
   onChange = e => this.setState({ name: e.target.value })

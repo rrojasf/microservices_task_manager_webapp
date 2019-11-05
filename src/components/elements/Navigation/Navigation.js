@@ -20,7 +20,7 @@ const Navigation = ({ className }) => (
           </li>
           <li className="navbar-item">
             <Link to="/tasks" className="nav-link">
-              Tasks
+              All Tasks
             </Link>
           </li>
         </ul>

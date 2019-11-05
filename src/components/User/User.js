@@ -62,7 +62,14 @@ export default class User extends Component {
       })
       .then(res =>
         this.setState({
-          users: [...this.state.users]
+          users: this.state.users.map(currentUser => {
+            if (currentUser._id === id) {
+              currentUser.name = res.data.name
+            }
+
+            return currentUser
+          }),
+          editingUser: ""
         })
       )
   }
@@ -78,7 +85,9 @@ export default class User extends Component {
   }
 
   showTasks = id => {
-    console.log(id)
+    console.log("tasks for", id)
+
+    this.props.history.push("/usersTasks/" + id)
   }
 
   // Delete Task

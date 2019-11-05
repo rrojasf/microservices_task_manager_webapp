@@ -1,167 +1,81 @@
 import React, { Component } from "react"
-import axios from "axios"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTimes, faCheck } from "@fortawesome/free-solid-svg-icons"
 
-export default class EditTodo extends Component {
+import "./TaskEdit.css"
+class TaskEdit extends Component {
   constructor(props) {
     super(props)
 
-    this.onChangeTodoDescription = this.onChangeTodoDescription.bind(this)
-    this.onChangeTodoResponsible = this.onChangeTodoResponsible.bind(this)
-    this.onChangeTodoPriority = this.onChangeTodoPriority.bind(this)
-    this.onChangeTodoCompleted = this.onChangeTodoCompleted.bind(this)
-    this.onSubmit = this.onSubmit.bind(this)
-
     this.state = {
-      todo_description: "",
-      todo_responsible: "",
-      todo_priority: "",
-      todo_completed: false
+      _id: props.task._id,
+      description: props.task.description
+    }
+  }
+  useEffect = () => {
+    window.addEventListener("keyup", this.handleKeyUp)
+
+    return () => {
+      window.removeEventListener("keyup", this.handleKeyUp)
     }
   }
 
-  componentDidMount() {
-    axios
-      .get("http://localhost:4000/todos/" + this.props.match.params.id)
-      .then(response => {
-        this.setState({
-          todo_description: response.data.todo_description,
-          todo_responsible: response.data.todo_responsible,
-          todo_priority: response.data.todo_priority,
-          todo_completed: response.data.todo_completed
-        })
-      })
-      .catch(function(error) {
-        console.log(error)
-      })
+  handleKeyUp = ev => {
+    // Handle ESC Key interaction
+    if (ev.code === "Escape") {
+      this.onCancel(ev)
+    }
   }
 
-  onChangeTodoDescription(e) {
-    this.setState({
-      todo_description: e.target.value
-    })
-  }
-
-  onChangeTodoResponsible(e) {
-    this.setState({
-      todo_responsible: e.target.value
-    })
-  }
-
-  onChangeTodoPriority(e) {
-    this.setState({
-      todo_priority: e.target.value
-    })
-  }
-
-  onChangeTodoCompleted(e) {
-    this.setState({
-      todo_completed: !this.state.todo_completed
-    })
-  }
-
-  onSubmit(e) {
+  onSubmit = e => {
     e.preventDefault()
-    const obj = {
-      todo_description: this.state.todo_description,
-      todo_responsible: this.state.todo_responsible,
-      todo_priority: this.state.todo_priority,
-      todo_completed: this.state.todo_completed
-    }
-    axios
-      .post(
-        "http://localhost:4000/todos/update/" + this.props.match.params.id,
-        obj
-      )
-      .then(res => console.log(res.data))
+    this.props.updateTask(this.state._id, this.state.description)
+    this.setState({ _id: "", description: "" })
+  }
 
-    this.props.history.push("/")
+  onChange = e => this.setState({ description: e.target.value })
+
+  onCancel = e => {
+    this.props.editCancel(this)
   }
 
   render() {
     return (
-      <div>
-        <h3>Update Todo</h3>
-        <form onSubmit={this.onSubmit}>
-          <div className="form-group">
-            <label>Description: </label>
-            <input
-              type="text"
-              className="form-control"
-              value={this.state.todo_description}
-              onChange={this.onChangeTodoDescription}
-            />
-          </div>
-          <div className="form-group">
-            <label>Responsible: </label>
-            <input
-              type="text"
-              className="form-control"
-              value={this.state.todo_responsible}
-              onChange={this.onChangeTodoResponsible}
-            />
-          </div>
-          <div className="form-group">
-            <div className="form-check form-check-inline">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="priorityOptions"
-                id="priorityLow"
-                value="Low"
-                checked={this.state.todo_priority === "Low"}
-                onChange={this.onChangeTodoPriority}
-              />
-              <label className="form-check-label">Low</label>
-            </div>
-            <div className="form-check form-check-inline">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="priorityOptions"
-                id="priorityMedium"
-                value="Medium"
-                checked={this.state.todo_priority === "Medium"}
-                onChange={this.onChangeTodoPriority}
-              />
-              <label className="form-check-label">Medium</label>
-            </div>
-            <div className="form-check form-check-inline">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="priorityOptions"
-                id="priorityHigh"
-                value="High"
-                checked={this.state.todo_priority === "High"}
-                onChange={this.onChangeTodoPriority}
-              />
-              <label className="form-check-label">High</label>
-            </div>
-            <div className="form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="completedCheckbox"
-                name="completedCheckbox"
-                onChange={this.onChangeTodoCompleted}
-                checked={this.state.todo_completed}
-                value={this.state.todo_completed}
-              />
-              <label className="form-check-label" htmlFor="completedCheckbox">
-                Completed
-              </label>
-            </div>
-            <br />
-            <div className="form-group">
-              <input
-                type="submit"
-                value="Update Todo"
-                className="btn btn-primary"
-              />
-            </div>
-          </div>
-        </form>
-      </div>
+      <form onSubmit={this.onSubmit} style={{ display: "flex" }} method="POST">
+        <input
+          type="text"
+          name="name"
+          style={{ flex: "10", padding: "5px" }}
+          placeholder={this.props.task.description}
+          onChange={this.onChange}
+        />
+        <button
+          data-testid="form-edit-submit-button"
+          type="submit"
+          id="submit-edit-todo-item"
+          className="btn btn-primary form_edit__button--first"
+          style={{ flex: "1" }}
+          disabled={
+            this.props.task.description === this.state.description
+              ? true
+              : false
+          }
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </button>
+        <button
+          data-testid="form-edit-cancel-edit-button"
+          id="cancel-edit-todo-item"
+          type="button"
+          className="btn btn-danger"
+          style={{ flex: "1" }}
+          onClick={this.onCancel}
+        >
+          <FontAwesomeIcon icon={faTimes} />
+        </button>
+      </form>
     )
   }
 }
+
+export default TaskEdit

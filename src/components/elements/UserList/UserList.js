@@ -1,82 +1,60 @@
 import React, { Component } from "react"
-import { Link } from "react-router-dom"
-import axios from "axios"
 
-import { API_USERS_URL } from "../../../config"
+import UserItem from "../UserItem/UserItem"
+import UserEdit from "../UserEdit/UserEdit"
 
-const User = props => (
-  <tr>
-    <td className="col">{props.user._id}</td>
-    <td className="col">{props.user.name}</td>
-    <td>
-      <Link to={"/users/edit/" + props.user._id}>Edit</Link>
-    </td>
-  </tr>
-)
-
-export default class UserList extends Component {
-  _isMounted = false
-
-  constructor(props) {
-    super(props)
-    this.state = { users: [] }
-  }
-
-  componentDidMount() {
-    this._isMounted = true
-
-    axios
-      .get(API_USERS_URL)
-      .then(response => {
-        if (this._isMounted === true) {
-          this.setState({ users: response.data })
-        }
-      })
-      .catch(function(error) {
-        console.log(error)
-      })
-  }
-
-  componentDidUpdate() {
-    this._isMounted = true
-
-    axios
-      .get(API_USERS_URL)
-      .then(response => {
-        if (this._isMounted === true) {
-          this.setState({ users: response.data })
-        }
-      })
-      .catch(function(error) {
-        console.log(error)
-      })
-  }
-
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
+class UserList extends Component {
   usersList() {
-    return this.state.users.map(function(currentUser, i) {
-      return <User user={currentUser} key={i} />
-    })
+    if (typeof this.props.users !== "undefined") {
+      const {
+        users,
+        deleteUser,
+        editUser,
+        showTasks,
+        editingUser,
+        editCancel,
+        updateUser
+      } = this.props
+
+      if (users.length > 0) {
+        return users.map(function(currentUser, i) {
+          if (editingUser === currentUser._id) {
+            return (
+              <UserEdit
+                user={currentUser}
+                key={currentUser._id}
+                editCancel={editCancel}
+                updateUser={updateUser}
+              />
+            )
+          } else {
+            return (
+              <UserItem
+                user={currentUser}
+                key={currentUser._id}
+                deleteUser={deleteUser}
+                editUser={editUser}
+                showTasks={showTasks}
+              />
+            )
+          }
+        })
+      } else {
+        return <div>No Items...</div>
+      }
+    } else {
+      return <div>No Props...</div>
+    }
   }
 
   render() {
     return (
       <div>
-        <h3>User List</h3>
-        <table className="table table-striped" style={{ marginTop: 20 }}>
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Name</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>{this.usersList()}</tbody>
-        </table>
+        <h3>Users List</h3>
+        {this.usersList()}
       </div>
     )
   }
 }
+
+export default UserList

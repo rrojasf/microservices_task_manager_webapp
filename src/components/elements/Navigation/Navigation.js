@@ -1,8 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faListAlt } from "@fortawesome/free-solid-svg-icons"
+import { Link } from "react-router-dom"
 
 import "./Navigation.css"
 
@@ -21,18 +19,8 @@ const Navigation = ({ className }) => (
             </Link>
           </li>
           <li className="navbar-item">
-            <Link to="/users/create" className="nav-link">
-              Create User
-            </Link>
-          </li>
-          <li className="navbar-item">
             <Link to="/tasks" className="nav-link">
               Tasks
-            </Link>
-          </li>
-          <li className="navbar-item">
-            <Link to="/tasks/create" className="nav-link">
-              Create Task
             </Link>
           </li>
         </ul>

@@ -1,24 +1,21 @@
 import React, { Component } from "react"
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom"
-
-// import "bootstrap/dist/css/bootstrap.min.css"
+import { BrowserRouter as Router, Route } from "react-router-dom"
 
 import Header from "../elements/Header/Header"
 import Navigation from "../elements/Navigation/Navigation"
-//import NotFound from "../elements/NotFound/NotFound"
+// import NotFound from "../elements/NotFound/NotFound"
 import Home from "../Home/Home"
-import TaskList from "../elements/TaskList/TaskList"
-import UserList from "../elements/UserList/UserList"
-import UserEdit from "../elements/UserEdit/UserEdit"
-import UserCreate from "../elements/UserCreate/UserCreate"
-
-//import TaskCreate from "../TaskCreate/TaskCreate"
-//import TaskEdit from "../Home/Home"
-//            <Route path="/users/edit/:id" component={UserEdit} />
-//            <Route path="/tasks/edit/:id" component={TaskEdit} />
-//
+import Task from "../Task/Task"
+import User from "../User/User"
 
 class App extends Component {
+  state = {
+    users: [],
+    tasks: [],
+    selectedUser: "",
+    selectedTask: ""
+  }
+
   render() {
     return (
       <div className="App">
@@ -28,11 +25,8 @@ class App extends Component {
             <Navigation />
 
             <Route path="/" exact component={Home} />
-            <Route path="/users" component={UserList} />
-            <Route path="/users/create" component={UserCreate} />
-            <Route path="/users/edit/:id" component={UserEdit} />
-            <Route path="/users/tasks/:id" component={TaskList} />
-            <Route path="/tasks" component={TaskList} />
+            <Route path="/users" component={User} />
+            <Route path="/tasks" component={Task} />
           </div>
         </Router>
       </div>

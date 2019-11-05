@@ -1,84 +1,47 @@
 import React, { Component } from "react"
-import { Link } from "react-router-dom"
-import axios from "axios"
+import PropTypes from "prop-types"
 
-import { API_TASKS_URL } from "../../../config"
+import TaskItem from "../TaskItem/TaskItem"
 
-const Task = props => (
-  <tr>
-    <td className={props.task.status ? "done" : ""}>
-      {props.task.description}
-    </td>
-    <td className={props.task.status ? "done" : ""}>{props.task.user_id}</td>
-    <td>
-      <Link to={"/tasks/edit/" + props.task._id}>Edit</Link>
-    </td>
-  </tr>
-)
-
-export default class TasksList extends Component {
-  _isMounted = false
-
-  constructor(props) {
-    super(props)
-    this.state = { tasks: [] }
-  }
-
-  componentDidMount() {
-    this._isMounted = true
-
-    axios
-      .get(API_TASKS_URL)
-      .then(response => {
-        if (this._isMounted) {
-          this.setState({ tasks: response.data })
-        }
-      })
-      .catch(function(error) {
-        console.log(error)
-      })
-  }
-
-  componentDidUpdate() {
-    this._isMounted = true
-
-    axios
-      .get(API_TASKS_URL)
-      .then(response => {
-        if (this._isMounted === true) {
-          this.setState({ tasks: response.data })
-        }
-      })
-      .catch(function(error) {
-        console.log(error)
-      })
-  }
-
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
+class TaskList extends Component {
   tasksList() {
-    return this.state.tasks.map(function(currentTask, i) {
-      return <Task task={currentTask} key={i} />
-    })
+    const { tasks, deleteTask, markComplete } = this.props
+
+    if (typeof this.props.tasks !== "undefined") {
+      if (tasks.length > 0) {
+        return tasks.map(function(currentTask, i) {
+          return (
+            <TaskItem
+              task={currentTask}
+              key={currentTask._id}
+              deleteTask={deleteTask}
+              markComplete={markComplete}
+            />
+          )
+        })
+      } else {
+        return <div>No Items...</div>
+      }
+    } else {
+      return <div>No Props...</div>
+    }
   }
 
   render() {
     return (
       <div>
         <h3>Tasks List</h3>
-        <table className="table table-striped" style={{ marginTop: 20 }}>
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th>Responsible</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>{this.tasksList()}</tbody>
-        </table>
+        {this.tasksList()}
       </div>
     )
   }
 }
+
+// PropTypes
+TaskList.propTypes = {
+  tasks: PropTypes.array.isRequired,
+  markComplete: PropTypes.func.isRequired,
+  deleteTask: PropTypes.func.isRequired
+}
+
+export default TaskList

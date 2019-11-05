@@ -1,72 +1,80 @@
 import React, { Component } from "react"
-import axios from "axios"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTimes, faCheck } from "@fortawesome/free-solid-svg-icons"
 
-import { API_USERS_URL } from "../../../config"
-
-export default class UserEdit extends Component {
+import "./UserEdit.css"
+class UserEdit extends Component {
   constructor(props) {
     super(props)
 
-    this.onChangeName = this.onChangeName.bind(this)
-    this.onSubmit = this.onSubmit.bind(this)
-
     this.state = {
-      name: ""
+      _id: props.user._id,
+      name: props.user.name
+    }
+  }
+  useEffect = () => {
+    window.addEventListener("keyup", this.handleKeyUp)
+
+    return () => {
+      window.removeEventListener("keyup", this.handleKeyUp)
     }
   }
 
-  componentDidMount() {
-    axios
-      .get(API_USERS_URL + this.props.match.params.id)
-      .then(response => {
-        this.setState({
-          name: response.data.name
-        })
-      })
-      .catch(function(error) {
-        console.log(error)
-      })
+  handleKeyUp = ev => {
+    // Handle ESC Key interaction
+    if (ev.code === "Escape") {
+      this.onCancel(ev)
+    }
   }
 
-  onChangeName(e) {
-    this.setState({
-      name: e.target.value
-    })
-  }
-
-  onSubmit(e) {
+  onSubmit = e => {
     e.preventDefault()
-    const obj = {
-      name: this.state.name
-    }
-    axios
-      .put(API_USERS_URL + this.props.match.params.id, obj)
-      .then(res => console.log(res.data))
+    let updateLegend = this.state.name
 
-    this.props.history.push("/")
+    this.props.updateUser(this.state._id, this.state.name)
+    this.setState({ _id: "", name: "" })
+    //this.refreshItem(updateLegend)
+  }
+
+  onChange = e => this.setState({ name: e.target.value })
+
+  onCancel = e => {
+    this.props.editCancel(this)
   }
 
   render() {
     return (
-      <div>
-        <h3>Update User</h3>
-        <form onSubmit={this.onSubmit}>
-          <div className="form-group">
-            <label>Name: </label>
-            <input
-              type="text"
-              className="form-control"
-              value={this.state.name}
-              onChange={this.onChangeName}
-            />
-          </div>
-
-          <br />
-          <div className="form-group">
-            <input type="submit" value="Update" className="btn btn-primary" />
-          </div>
-        </form>
-      </div>
+      <form onSubmit={this.onSubmit} style={{ display: "flex" }} method="POST">
+        <input
+          type="text"
+          name="name"
+          style={{ flex: "10", padding: "5px" }}
+          placeholder={this.props.user.name}
+          onChange={this.onChange}
+        />
+        <button
+          data-testid="form-edit-submit-button"
+          type="submit"
+          id="submit-edit-todo-item"
+          className="btn btn-primary form_edit__button--first"
+          style={{ flex: "1" }}
+          disabled={this.props.user.name === this.state.name ? true : false}
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </button>
+        <button
+          data-testid="form-edit-cancel-edit-button"
+          id="cancel-edit-todo-item"
+          type="button"
+          className="btn btn-danger"
+          style={{ flex: "1" }}
+          onClick={this.onCancel}
+        >
+          <FontAwesomeIcon icon={faTimes} />
+        </button>
+      </form>
     )
   }
 }
+
+export default UserEdit
